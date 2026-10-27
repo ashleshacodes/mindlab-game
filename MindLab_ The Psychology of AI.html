@@ -1,0 +1,966 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MindLab: The Psychology of AI</title>
+<meta name="description" content="MindLab: interactive psychology and AI games. Can you outsmart your own brain?">
+<style>
+/* ============================================================
+   MindLab styles
+   1. Tokens  2. Base  3. Layout  4. Components  5. Games  6. Responsive
+   ============================================================ */
+
+/* 1. Tokens ------------------------------------------------- */
+:root {
+  --bg: #070b1f;
+  --bg-2: #0c1330;
+  --card: #111a40;
+  --card-2: #16215533;
+  --line: #2a3a7a;
+  --text: #eef1ff;
+  --muted: #b3bde0;
+  --blue: #3b82f6;
+  --blue-d: #2563eb;
+  --purple: #8b5cf6;
+  --purple-d: #7c3aed;
+  --cyan: #22d3ee;
+  --good: #34d399;
+  --good-bg: #0c3a30;
+  --bad: #fb7185;
+  --bad-bg: #44162a;
+  --radius: 18px;
+  --shadow: 0 10px 40px rgba(0, 0, 0, .35);
+}
+
+/* 2. Base --------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text);
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(139, 92, 246, .25), transparent 60%),
+    radial-gradient(800px 500px at -10% 10%, rgba(34, 211, 238, .14), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+h1, h2, h3 { line-height: 1.2; margin: 0 0 .5em; }
+h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); letter-spacing: -.02em; }
+h2 { font-size: clamp(1.7rem, 3.5vw, 2.4rem); }
+h3 { font-size: 1.35rem; }
+p { margin: 0 0 1em; }
+a { color: var(--cyan); }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 8px; }
+[hidden] { display: none !important; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.skip {
+  position: absolute; left: 12px; top: -60px; z-index: 100;
+  background: var(--cyan); color: #04122b; padding: 10px 16px; border-radius: 10px; font-weight: 700;
+}
+.skip:focus { top: 12px; }
+.grad {
+  background: linear-gradient(90deg, var(--cyan), var(--blue) 50%, var(--purple));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* 3. Layout ------------------------------------------------- */
+.wrap { width: min(1080px, 100% - 32px); margin-inline: auto; }
+section { padding: 56px 0; }
+.eyebrow {
+  display: inline-block; font-size: .85rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--cyan); margin-bottom: .6rem;
+}
+
+/* Header + scoreboard */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(7, 11, 31, .88); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding: 10px 0; }
+.brand { font-weight: 800; font-size: 1.3rem; text-decoration: none; color: var(--text); }
+.brand span { color: var(--cyan); }
+.nav { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+.nav a {
+  color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 999px;
+  font-size: .95rem; font-weight: 600;
+}
+.nav a:hover { color: var(--text); background: rgba(59, 130, 246, .18); }
+.scoreboard { display: flex; gap: 8px; flex-wrap: wrap; list-style: none; padding: 0; margin: 0; width: 100%; }
+.scoreboard li {
+  font-size: .85rem; padding: 3px 12px; border: 1px solid var(--line); border-radius: 999px;
+  color: var(--muted); background: var(--bg-2);
+}
+.scoreboard li b { color: var(--text); margin-left: 4px; }
+.scoreboard li.done { border-color: var(--cyan); }
+.scoreboard li.done b { color: var(--cyan); }
+
+/* 4. Components --------------------------------------------- */
+.card {
+  background: linear-gradient(160deg, rgba(22, 33, 85, .85), rgba(14, 21, 54, .92));
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: clamp(20px, 4vw, 36px); box-shadow: var(--shadow);
+}
+.btn {
+  font: inherit; font-weight: 700; font-size: 1.15rem; color: #fff; cursor: pointer;
+  padding: 14px 28px; border: 0; border-radius: 14px;
+  background: linear-gradient(90deg, var(--blue-d), var(--purple-d));
+  box-shadow: 0 6px 20px rgba(37, 99, 235, .35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(124, 58, 237, .4); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn.ghost {
+  background: transparent; border: 2px solid var(--line); box-shadow: none; color: var(--text);
+}
+.btn.ghost:hover { border-color: var(--cyan); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+
+.hero { padding: 80px 0 40px; text-align: center; }
+.hero p.lead { font-size: 1.3rem; color: var(--muted); max-width: 46ch; margin: 0 auto 28px; }
+.hero .btn { font-size: 1.3rem; padding: 18px 40px; }
+
+.grid { display: grid; gap: 18px; }
+.grid.four { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.mini {
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 18px;
+}
+.mini .ico { font-size: 2rem; display: block; margin-bottom: 6px; }
+.mini h3 { font-size: 1.15rem; margin-bottom: .3em; }
+.mini p { color: var(--muted); font-size: 1rem; margin: 0; }
+.tip {
+  margin-top: 22px; padding: 14px 18px; border-radius: 12px; font-size: 1rem;
+  background: rgba(34, 211, 238, .08); border: 1px dashed var(--cyan); color: var(--muted);
+}
+.tip strong { color: var(--cyan); }
+
+.game-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.game-head .tag {
+  font-size: .85rem; font-weight: 700; color: #04122b; background: var(--cyan);
+  padding: 2px 12px; border-radius: 999px;
+}
+.howto { color: var(--muted); }
+.howto strong { color: var(--text); }
+
+/* Feedback + explanation boxes */
+.feedback {
+  margin-top: 16px; padding: 14px 18px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--bg-2);
+}
+.feedback:empty { padding: 0; border: 0; margin: 0; }
+.feedback.good { background: var(--good-bg); border-color: var(--good); }
+.feedback.bad { background: var(--bad-bg); border-color: var(--bad); }
+.feedback strong.verdict { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+.explain {
+  margin-top: 18px; padding: 18px 20px; border-radius: 14px;
+  background: rgba(139, 92, 246, .12); border: 1px solid var(--purple);
+}
+.explain h4 { margin: 0 0 6px; color: var(--cyan); font-size: 1.1rem; }
+.explain p:last-child { margin-bottom: 0; }
+
+.meta { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+.progress { height: 8px; background: var(--bg-2); border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+.progress > span {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--cyan), var(--purple)); transition: width .3s ease;
+}
+
+.bigscore { font-size: 3.2rem; font-weight: 800; line-height: 1; }
+.bigscore small { font-size: 1.4rem; color: var(--muted); font-weight: 600; }
+
+/* 5. Games -------------------------------------------------- */
+/* Stroop */
+.stroop-stage {
+  text-align: center; padding: 28px 10px; margin: 6px 0 22px;
+  background: #fff1; border-radius: 16px; border: 1px solid var(--line);
+}
+.stroop-word {
+  font-size: clamp(3.5rem, 14vw, 8rem); font-weight: 900; letter-spacing: .04em; line-height: 1.1;
+}
+.opts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.opt {
+  display: flex; align-items: center; gap: 12px; text-align: left; font: inherit; font-weight: 700;
+  font-size: 1.15rem; color: var(--text); cursor: pointer; padding: 16px 18px;
+  background: var(--bg-2); border: 2px solid var(--line); border-radius: 14px;
+  transition: border-color .15s, background .15s, transform .15s;
+}
+.opt:hover:not(:disabled) { border-color: var(--cyan); transform: translateY(-2px); }
+.opt:disabled { cursor: default; }
+.opt .key {
+  flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+  background: #2a3a7a; font-size: .95rem;
+}
+.opt .dot { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff8; }
+.opt.right { border-color: var(--good); background: var(--good-bg); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.opt-text { align-items: flex-start; font-weight: 500; }
+.opts.stack { grid-template-columns: 1fr; }
+
+/* Memory */
+.mem-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 14px 0;
+}
+.mem-cell {
+  aspect-ratio: 1; display: grid; place-items: center; font-size: clamp(2.2rem, 7vw, 4rem);
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px;
+}
+.timer-row { display: flex; align-items: center; gap: 18px; }
+.timer-num { font-size: 3rem; font-weight: 800; color: var(--cyan); min-width: 2.2ch; text-align: center; }
+.timer-row .progress { flex: 1; margin: 0; height: 12px; }
+.timer-row .progress > span { transition: width .2s linear; }
+textarea {
+  width: 100%; min-height: 130px; font: inherit; font-size: 1.15rem; padding: 14px;
+  color: var(--text); background: var(--bg-2); border: 2px solid var(--line); border-radius: 14px; resize: vertical;
+}
+textarea:focus { border-color: var(--cyan); outline: none; }
+label.field { display: block; font-weight: 700; margin-bottom: 8px; }
+.chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+.chip {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--bg-2); font-weight: 600;
+}
+.chip .em { font-size: 1.7rem; }
+.chip small { display: block; color: var(--muted); font-weight: 500; font-size: .8rem; }
+.chip.got { border-color: var(--good); background: var(--good-bg); }
+.chip.miss { border-color: var(--bad); background: var(--bad-bg); }
+
+/* Quiz */
+.scenario {
+  font-size: 1.2rem; padding: 16px 20px; border-radius: 14px; margin-bottom: 14px;
+  background: rgba(59, 130, 246, .12); border: 1px solid var(--blue);
+}
+.question { font-size: 1.3rem; }
+
+/* Debrief */
+.qlist { padding-left: 1.3em; }
+.qlist li { margin-bottom: .6em; }
+.sum { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin: 18px 0; }
+.sum .mini b { display: block; font-size: 1.8rem; color: var(--cyan); }
+footer { padding: 30px 0 50px; color: var(--muted); font-size: .95rem; text-align: center; border-top: 1px solid var(--line); }
+
+/* 6. Responsive + motion ------------------------------------ */
+@media (max-width: 640px) {
+  body { font-size: 1.05rem; }
+  .nav { display: none; }
+  .mem-grid { grid-template-columns: repeat(2, 1fr); }
+  section { padding: 40px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#welcome">Mind<span>Lab</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#stroop">Stroop</a>
+      <a href="#memory">Memory</a>
+      <a href="#trust">Trust the AI</a>
+      <a href="#bias">Spot the Bias</a>
+      <a href="#debrief">Debrief</a>
+    </nav>
+    <ul class="scoreboard" aria-label="Your scores so far">
+      <li data-score="stroop">Stroop <b>–</b></li>
+      <li data-score="memory">Memory <b>–</b></li>
+      <li data-score="trust">Trust the AI <b>–</b></li>
+      <li data-score="bias">Spot the Bias <b>–</b></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- WELCOME ------------------------------------------------ -->
+<section id="welcome" class="hero">
+  <div class="wrap">
+    <span class="eyebrow">A Communication Skills experiment</span>
+    <h1><span class="grad">MindLab</span><br>The Psychology of AI</h1>
+    <p class="lead">Can you outsmart your own brain? Four short games, one big question: how do we think, remember, judge, and trust technology?</p>
+    <button class="btn" id="startBtn" type="button">Start Exploring &rarr;</button>
+
+    <div class="grid four" style="margin-top:46px;text-align:left">
+      <div class="mini"><span class="ico" aria-hidden="true">🎨</span><h3>1. Stroop Speed Test</h3><p>Attention vs. automatic reading. About 1 minute.</p></div>
+      <div class="mini"><span class="ico" aria-hidden="true">🧠</span><h3>2. 15-Second Memory Lab</h3><p>What sticks, and why. About 2 minutes.</p></div>
+      <div class="mini"><span class="ico" aria-hidden="true">🤖</span><h3>3. Trust the AI?</h3><p>Six scenarios about AI answers. About 3 minutes.</p></div>
+      <div class="mini"><span class="ico" aria-hidden="true">🔍</span><h3>Bonus: Spot the Bias</h3><p>First impressions and thinking traps. About 2 minutes.</p></div>
+    </div>
+
+    <div class="tip" style="text-align:left">
+      <strong>Presenter tip:</strong> press F11 for full screen. Classmates can shout answers while a volunteer clicks, or use the keyboard (number keys 1-4 in Stroop, 1-3 or A-C in quizzes). Nothing is saved or collected: scores disappear when the page closes.
+    </div>
+  </div>
+</section>
+
+<!-- GAME 1: STROOP ---------------------------------------- -->
+<section id="stroop">
+  <div class="wrap">
+    <div class="card">
+      <div class="game-head"><h2>The Stroop Speed Test</h2><span class="tag">Attention</span></div>
+      <p class="howto"><strong>How to play:</strong> a colour word appears in coloured ink. Choose the <strong>ink colour</strong>, not the word. Five rounds.</p>
+      <div id="stroop-app"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GAME 2: MEMORY ---------------------------------------- -->
+<section id="memory">
+  <div class="wrap">
+    <div class="card">
+      <div class="game-head"><h2>The 15-Second Memory Lab</h2><span class="tag">Memory</span></div>
+      <p class="howto"><strong>How to play:</strong> ten objects appear for 15 seconds. When they vanish, type every one you remember.</p>
+      <div id="memory-app"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GAME 3: TRUST THE AI ---------------------------------- -->
+<section id="trust">
+  <div class="wrap">
+    <div class="card">
+      <div class="game-head"><h2>Trust the AI?</h2><span class="tag">AI &amp; trust</span></div>
+      <p class="howto"><strong>How to play:</strong> read each scenario and pick the wisest response. Six questions, three options each.</p>
+      <div id="trust-app"></div>
+    </div>
+  </div>
+</section>
+
+<!-- BONUS: SPOT THE BIAS ---------------------------------- -->
+<section id="bias">
+  <div class="wrap">
+    <div class="card">
+      <div class="game-head"><h2>Bonus: Spot the Bias</h2><span class="tag">Judgement</span></div>
+      <p class="howto"><strong>How to play:</strong> each scenario shows a thinking shortcut in action. Pick the most reasonable response. Five questions.</p>
+      <div id="bias-app"></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEBRIEF ------------------------------------------------ -->
+<section id="debrief">
+  <div class="wrap">
+    <div class="card">
+      <span class="eyebrow">Debrief</span>
+      <h2>What did MindLab show us?</h2>
+      <div class="sum" id="summary" aria-live="polite"></div>
+      <div class="grid four">
+        <div class="mini"><span class="ico" aria-hidden="true">🎨</span><h3>Attention</h3><p>Habits like reading run on autopilot and can hijack what we are trying to do.</p></div>
+        <div class="mini"><span class="ico" aria-hidden="true">🧠</span><h3>Memory</h3><p>We remember what we attend to and what we can group. Memory is limited, not a recording.</p></div>
+        <div class="mini"><span class="ico" aria-hidden="true">🔍</span><h3>Bias</h3><p>First impressions and expectations quietly steer our judgements.</p></div>
+        <div class="mini"><span class="ico" aria-hidden="true">🤖</span><h3>AI trust</h3><p>Confident is not the same as correct. Check, compare, then decide.</p></div>
+      </div>
+
+      <h3 style="margin-top:30px">Questions for the class</h3>
+      <ol class="qlist">
+        <li>Which game surprised you most, and why do you think your brain reacted that way?</li>
+        <li>Think of a time you were sure about something and turned out wrong. What happened?</li>
+        <li>Does an AI answer feel more believable when it sounds confident? What could you check first?</li>
+        <li>Which thinking trap do you fall into most often: first impressions, only seeking agreement, or overconfidence?</li>
+        <li>What is one habit you will use to double-check an AI answer this week?</li>
+      </ol>
+
+      <div class="explain">
+        <h4>The big idea</h4>
+        <p><strong>Think critically. Question confidently. Use AI wisely.</strong> Treat AI as a thinking partner: it can speed up ideas and drafts, but you stay responsible for checking the facts and making the final call.</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn" type="button" id="resetAll">Reset all games</button>
+        <a class="btn ghost" href="#welcome" style="text-decoration:none;display:inline-block">Back to top</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">MindLab runs entirely in your browser. No data is collected, stored, or sent anywhere.</div>
+</footer>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- Helpers ---------- */
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const shuffle = (arr) => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const LETTERS = ['A', 'B', 'C', 'D'];
+
+  /* ---------- Scoreboard (in memory only) ---------- */
+  const TOTALS = { stroop: 5, memory: 10, trust: 6, bias: 5 };
+  const NAMES = { stroop: 'Stroop', memory: 'Memory Lab', trust: 'Trust the AI', bias: 'Spot the Bias' };
+  const scores = { stroop: null, memory: null, trust: null, bias: null };
+
+  function setScore(key, value) {
+    scores[key] = value;
+    const li = $(`[data-score="${key}"]`);
+    const b = li.querySelector('b');
+    b.textContent = value === null ? '–' : `${value}/${TOTALS[key]}`;
+    li.classList.toggle('done', value !== null);
+    renderSummary();
+  }
+
+  function renderSummary() {
+    const box = $('#summary');
+    box.innerHTML = Object.keys(TOTALS).map((k) => {
+      const v = scores[k] === null ? 'Not played' : `${scores[k]} / ${TOTALS[k]}`;
+      return `<div class="mini"><b>${v}</b>${NAMES[k]}</div>`;
+    }).join('');
+  }
+
+  /* ---------- Shared feedback markup ---------- */
+  const feedbackHTML = (ok, headline, body) =>
+    `<strong class="verdict">${ok ? '✅' : '❌'} ${headline}</strong>${body}`;
+
+  /* ============================================================
+     GAME 1: STROOP
+     ============================================================ */
+  const stroop = (() => {
+    const root = $('#stroop-app');
+    const COLORS = [
+      { name: 'RED', hex: '#ff5470' },
+      { name: 'BLUE', hex: '#4d9fff' },
+      { name: 'GREEN', hex: '#2de08f' },
+      { name: 'YELLOW', hex: '#ffd23f' },
+    ];
+    const ROUNDS = 5;
+    let st;
+
+    function buildRounds() {
+      const rounds = [];
+      for (let i = 0; i < ROUNDS; i++) {
+        const word = pick(COLORS);
+        const ink = pick(COLORS.filter((c) => c.name !== word.name)); // always a mismatch
+        rounds.push({ word, ink });
+      }
+      return rounds;
+    }
+
+    function intro() {
+      st = null;
+      root.innerHTML = `
+        <p>Ready? Try to answer as fast <em>and</em> as accurately as you can.</p>
+        <button class="btn" type="button" data-action="start">Start the test</button>`;
+    }
+
+    function start() {
+      st = { rounds: buildRounds(), i: 0, score: 0, locked: false, t0: 0, times: [] };
+      round();
+    }
+
+    function round() {
+      const r = st.rounds[st.i];
+      st.locked = false;
+      const options = shuffle(COLORS);
+      root.innerHTML = `
+        <div class="meta"><span>Round ${st.i + 1} of ${ROUNDS}</span><span>Score: ${st.score}</span></div>
+        <div class="progress"><span style="width:${(st.i / ROUNDS) * 100}%"></span></div>
+        <div class="stroop-stage">
+          <div class="stroop-word" style="color:${r.ink.hex}" role="img"
+               aria-label="The word ${r.word.name} written in ${r.ink.name.toLowerCase()} ink">${r.word.name}</div>
+        </div>
+        <p><strong>Which INK colour is this word printed in?</strong></p>
+        <div class="opts" role="group" aria-label="Ink colour options">
+          ${options.map((c, n) => `
+            <button type="button" class="opt" data-action="answer" data-name="${c.name}">
+              <span class="key">${n + 1}</span><span class="dot" style="background:${c.hex}"></span>${c.name}
+            </button>`).join('')}
+        </div>
+        <div class="feedback" role="status"></div>
+        <div class="btn-row"><button class="btn" type="button" data-action="next" hidden></button></div>`;
+      st.t0 = performance.now();
+      const first = root.querySelector('.opt');
+      if (first) first.focus({ preventScroll: true });
+    }
+
+    function answer(btn) {
+      if (!st || st.locked) return;
+      st.locked = true;
+      st.times.push(performance.now() - st.t0);
+      const r = st.rounds[st.i];
+      const ok = btn.dataset.name === r.ink.name;
+      if (ok) st.score++;
+
+      root.querySelectorAll('.opt').forEach((o) => {
+        o.disabled = true;
+        if (o.dataset.name === r.ink.name) o.classList.add('right');
+        else if (o === btn) o.classList.add('wrong');
+      });
+      const fb = $('.feedback', root);
+      fb.className = `feedback ${ok ? 'good' : 'bad'}`;
+      fb.innerHTML = ok
+        ? feedbackHTML(true, 'Correct!', `<p style="margin:0">The ink was ${r.ink.name}, even though the word said ${r.word.name}.</p>`)
+        : feedbackHTML(false, 'Not quite.', `<p style="margin:0">The word said ${r.word.name}, but the ink was <strong>${r.ink.name}</strong>. Your brain read the word first.</p>`);
+
+      const last = st.i === ROUNDS - 1;
+      const next = $('[data-action="next"]', root);
+      next.textContent = last ? 'See results' : 'Next round →';
+      next.hidden = false;
+      next.focus({ preventScroll: true });
+      $('.meta span:last-child', root).textContent = `Score: ${st.score}`;
+    }
+
+    function next() {
+      if (!st) return;
+      st.i++;
+      if (st.i >= ROUNDS) finish(); else round();
+    }
+
+    function finish() {
+      const avg = st.times.reduce((a, b) => a + b, 0) / st.times.length / 1000;
+      setScore('stroop', st.score);
+      root.innerHTML = `
+        <div class="progress"><span style="width:100%"></span></div>
+        <div class="bigscore">${st.score}<small> / ${ROUNDS}</small></div>
+        <p style="color:var(--muted)">Average response time: <strong style="color:var(--text)">${avg.toFixed(1)} seconds</strong></p>
+        <div class="explain">
+          <h4>Why was this tricky?</h4>
+          <p>Reading is so practised that it is <strong>automatic</strong>: your brain processes the word before you decide to. When the word and the ink disagree, two signals compete, and you must suppress the automatic one. This clash is called <strong>cognitive interference</strong>.</p>
+          <p>Lesson: even simple tasks need effort when habit and intention collide. AI tools can create the same clash, because a fluent, confident answer pulls us to accept it before we have checked it.</p>
+        </div>
+        <div class="btn-row"><button class="btn" type="button" data-action="start">Play again</button></div>`;
+    }
+
+    root.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-action]');
+      if (!b) return;
+      if (b.dataset.action === 'start') start();
+      else if (b.dataset.action === 'answer') answer(b);
+      else if (b.dataset.action === 'next') next();
+    });
+    root.addEventListener('keydown', (e) => {
+      if (!st || st.locked) return;
+      const opts = [...root.querySelectorAll('.opt')];
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= opts.length) answer(opts[n - 1]);
+    });
+
+    intro();
+    return { reset() { intro(); } };
+  })();
+
+  /* ============================================================
+     GAME 2: MEMORY LAB
+     ============================================================ */
+  const memory = (() => {
+    const root = $('#memory-app');
+    const SHOW_MS = 15000;
+    const COUNT = 10;
+    const POOL = [
+      { e: '🍎', n: 'apple', c: 'Fruit', a: ['apple'] },
+      { e: '🍌', n: 'banana', c: 'Fruit', a: ['banana'] },
+      { e: '🍇', n: 'grapes', c: 'Fruit', a: ['grape'] },
+      { e: '🍓', n: 'strawberry', c: 'Fruit', a: ['strawberry', 'strawberrie'] },
+      { e: '🐶', n: 'dog', c: 'Animals', a: ['dog', 'puppy'] },
+      { e: '🐱', n: 'cat', c: 'Animals', a: ['cat', 'kitten'] },
+      { e: '🐟', n: 'fish', c: 'Animals', a: ['fish'] },
+      { e: '🐦', n: 'bird', c: 'Animals', a: ['bird'] },
+      { e: '🚗', n: 'car', c: 'Vehicles', a: ['car', 'automobile'] },
+      { e: '🚲', n: 'bicycle', c: 'Vehicles', a: ['bicycle', 'bike', 'cycle'] },
+      { e: '✈️', n: 'plane', c: 'Vehicles', a: ['plane', 'airplane', 'aeroplane', 'aircraft', 'jet'] },
+      { e: '⛵', n: 'boat', c: 'Vehicles', a: ['boat', 'sailboat', 'ship', 'yacht'] },
+      { e: '📖', n: 'book', c: 'Everyday objects', a: ['book'] },
+      { e: '🔑', n: 'key', c: 'Everyday objects', a: ['key'] },
+      { e: '⏰', n: 'clock', c: 'Everyday objects', a: ['clock', 'alarm', 'alarm clock', 'watch'] },
+      { e: '☂️', n: 'umbrella', c: 'Everyday objects', a: ['umbrella'] },
+      { e: '🍕', n: 'pizza', c: 'Food', a: ['pizza'] },
+      { e: '🍔', n: 'burger', c: 'Food', a: ['burger', 'hamburger'] },
+      { e: '🎂', n: 'cake', c: 'Food', a: ['cake'] },
+      { e: '🍪', n: 'cookie', c: 'Food', a: ['cookie', 'biscuit'] },
+    ];
+
+    let timerId = null;   // the ONLY timer handle: guarantees no overlapping timers
+    let endAt = 0;
+    let items = [];
+
+    function stopTimer() {
+      if (timerId !== null) { clearInterval(timerId); timerId = null; }
+    }
+
+    function intro() {
+      stopTimer();
+      root.innerHTML = `
+        <p>Look carefully: you will have exactly <strong>15 seconds</strong>. Do not write anything down. The timer starts as soon as you press the button.</p>
+        <button class="btn" type="button" data-action="start">Show me the objects</button>`;
+    }
+
+    function start() {
+      if (timerId !== null) return;             // ignore repeated starts while a round is running
+      items = shuffle(POOL).slice(0, COUNT);
+      endAt = Date.now() + SHOW_MS;
+      root.innerHTML = `
+        <p class="sr-only">Memorise these ten objects. You have 15 seconds.</p>
+        <div class="timer-row">
+          <div class="timer-num" id="memNum" aria-hidden="true">15</div>
+          <div class="progress" aria-hidden="true"><span id="memBar" style="width:100%"></span></div>
+        </div>
+        <div class="mem-grid" role="list" aria-label="Objects to memorise">
+          ${items.map((it) => `<div class="mem-cell" role="listitem" aria-label="${it.n}">${it.e}</div>`).join('')}
+        </div>`;
+      tick();
+      timerId = setInterval(tick, 200);
+    }
+
+    function tick() {
+      const left = Math.max(0, endAt - Date.now());
+      const num = $('#memNum'), bar = $('#memBar');
+      if (num) num.textContent = Math.ceil(left / 1000);
+      if (bar) bar.style.width = `${(left / SHOW_MS) * 100}%`;
+      if (left <= 0) { stopTimer(); recall(); }
+    }
+
+    function recall() {
+      root.innerHTML = `
+        <p><strong>Time is up!</strong> The objects are hidden. What did you see?</p>
+        <label class="field" for="memInput">Type the objects you remember (separate with commas, spaces or new lines):</label>
+        <textarea id="memInput" autocomplete="off" spellcheck="false" placeholder="e.g. apple, dog, key..."></textarea>
+        <div class="btn-row"><button class="btn" type="button" data-action="check">Check my answers</button></div>`;
+      $('#memInput').focus({ preventScroll: true });
+    }
+
+    function recalled(typed, item) {
+      const text = ' ' + typed.toLowerCase().replace(/[^a-z\u00c0-\uffff\s]/g, ' ').replace(/\s+/g, ' ') + ' ';
+      if (typed.includes(item.e.replace('\uFE0F', ''))) return true;            // pasted emoji
+      return item.a.some((alias) => new RegExp(`\\s${alias}(s|es)?\\s`).test(text));
+    }
+
+    function check() {
+      const typed = ($('#memInput') || {}).value || '';
+      const results = items.map((it) => ({ it, got: recalled(typed, it) }));
+      const score = results.filter((r) => r.got).length;
+      setScore('memory', score);
+
+      const cats = {};
+      items.forEach((it) => { cats[it.c] = (cats[it.c] || 0) + 1; });
+      const catText = Object.entries(cats).map(([c, n]) => `${c} (${n})`).join(', ');
+
+      root.innerHTML = `
+        <div class="bigscore">${score}<small> / ${COUNT}</small></div>
+        <p style="color:var(--muted)">Green = you remembered it. Red = missed.</p>
+        <div class="chips">
+          ${results.map((r) => `
+            <div class="chip ${r.got ? 'got' : 'miss'}">
+              <span class="em" aria-hidden="true">${r.it.e}</span>
+              <span>${r.it.n}<small>${r.it.c} · ${r.got ? 'remembered' : 'missed'}</small></span>
+            </div>`).join('')}
+        </div>
+        <div class="explain">
+          <h4>What shaped your memory?</h4>
+          <p><strong>Attention:</strong> you can only hold a handful of items at once (roughly 5 to 9), so what you focused on first and last tends to stick.</p>
+          <p><strong>Familiarity:</strong> everyday objects with an easy name are simpler to store than unusual ones.</p>
+          <p><strong>Grouping:</strong> this round contained ${catText}. If you clustered them (all the fruit together, all the vehicles together) you needed to remember fewer "chunks". This is called <strong>chunking</strong>.</p>
+          <p>Lesson: memory is not a recording. It is a limited, reconstructive process, so confident memories can still be wrong. The same is true when an AI "remembers" facts.</p>
+        </div>
+        <div class="btn-row"><button class="btn" type="button" data-action="start">Play again (new objects)</button></div>`;
+    }
+
+    root.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-action]');
+      if (!b) return;
+      if (b.dataset.action === 'start') start();
+      else if (b.dataset.action === 'check') check();
+    });
+
+    intro();
+    return { reset() { intro(); }, _recalled: recalled };
+  })();
+
+  /* ============================================================
+     QUIZ ENGINE (used by "Trust the AI?" and "Spot the Bias")
+     ============================================================ */
+  function createQuiz({ rootId, key, questions, startLabel, intro, tiers, takeaway }) {
+    const root = $(rootId);
+    const N = questions.length;
+    let st;
+
+    function showIntro() {
+      st = null;
+      root.innerHTML = `<p>${intro}</p><button class="btn" type="button" data-action="start">${startLabel}</button>`;
+    }
+
+    function start() { st = { i: 0, score: 0, locked: false }; render(); }
+
+    function render() {
+      const q = questions[st.i];
+      st.locked = false;
+      root.innerHTML = `
+        <div class="meta"><span>Question ${st.i + 1} of ${N}</span><span>Score: ${st.score}</span></div>
+        <div class="progress"><span style="width:${(st.i / N) * 100}%"></span></div>
+        <p class="scenario">${q.scenario}</p>
+        <h3 class="question">${q.question}</h3>
+        <div class="opts stack" role="group" aria-label="Answer options">
+          ${q.options.map((o, n) => `
+            <button type="button" class="opt opt-text" data-action="pick" data-n="${n}">
+              <span class="key">${LETTERS[n]}</span><span>${o}</span>
+            </button>`).join('')}
+        </div>
+        <div class="feedback" role="status"></div>
+        <div class="btn-row"><button class="btn" type="button" data-action="next" hidden></button></div>`;
+      const first = root.querySelector('.opt');
+      if (first) first.focus({ preventScroll: true });
+    }
+
+    function pickAnswer(btn) {
+      if (!st || st.locked) return;
+      st.locked = true;
+      const q = questions[st.i];
+      const chosen = Number(btn.dataset.n);
+      const ok = chosen === q.answer;
+      if (ok) st.score++;
+
+      root.querySelectorAll('.opt').forEach((o) => {
+        o.disabled = true;
+        const n = Number(o.dataset.n);
+        if (n === q.answer) o.classList.add('right');
+        else if (n === chosen) o.classList.add('wrong');
+      });
+      const fb = $('.feedback', root);
+      fb.className = `feedback ${ok ? 'good' : 'bad'}`;
+      fb.innerHTML = feedbackHTML(
+        ok,
+        ok ? 'Great choice!' : `Not quite. The best answer is ${LETTERS[q.answer]}.`,
+        `<p style="margin:0">${q.why}</p>`
+      );
+      $('.meta span:last-child', root).textContent = `Score: ${st.score}`;
+
+      const next = $('[data-action="next"]', root);
+      next.textContent = st.i === N - 1 ? 'See my result' : 'Next question →';
+      next.hidden = false;
+      next.focus({ preventScroll: true });
+    }
+
+    function next() {
+      if (!st) return;
+      st.i++;
+      if (st.i >= N) finish(); else render();
+    }
+
+    function finish() {
+      setScore(key, st.score);
+      const tier = tiers.find((t) => st.score >= t.min);
+      root.innerHTML = `
+        <div class="progress"><span style="width:100%"></span></div>
+        <div class="bigscore">${st.score}<small> / ${N}</small></div>
+        <h3 style="margin-top:10px">${tier.title}</h3>
+        <p style="color:var(--muted)">${tier.text}</p>
+        <div class="explain"><h4>Key takeaway</h4>${takeaway}</div>
+        <div class="btn-row"><button class="btn" type="button" data-action="start">Play again</button></div>`;
+    }
+
+    root.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-action]');
+      if (!b) return;
+      if (b.dataset.action === 'start') start();
+      else if (b.dataset.action === 'pick') pickAnswer(b);
+      else if (b.dataset.action === 'next') next();
+    });
+    root.addEventListener('keydown', (e) => {
+      if (!st || st.locked) return;
+      const opts = [...root.querySelectorAll('.opt')];
+      const k = e.key.toLowerCase();
+      let n = parseInt(k, 10) - 1;
+      if (Number.isNaN(n)) n = ['a', 'b', 'c'].indexOf(k);
+      if (n >= 0 && n < opts.length) pickAnswer(opts[n]);
+    });
+
+    showIntro();
+    return { reset() { showIntro(); } };
+  }
+
+  /* ---------- Game 3 content ---------- */
+  const trust = createQuiz({
+    rootId: '#trust-app',
+    key: 'trust',
+    startLabel: 'Start the quiz',
+    intro: 'Six everyday situations where AI gives an answer. What should you do?',
+    questions: [
+      {
+        scenario: '📚 You ask an AI tool for sources for your essay. It replies with a confident citation: author, journal, year and page numbers.',
+        question: 'What is the smartest next step?',
+        options: [
+          'Copy it into your bibliography. It looks very detailed, so it must be real.',
+          'Search for the paper in a library or Google Scholar to confirm it exists and says what the AI claims.',
+          'Never use AI for research again.',
+        ],
+        answer: 1,
+        why: 'AI can produce realistic-looking references that do not exist (often called "hallucinations"). Detail and confidence are not proof, so verify with a trusted source.',
+      },
+      {
+        scenario: '🧮 An AI solves your maths homework step by step, but its final answer is different from the one in your textbook.',
+        question: 'What should you do?',
+        options: [
+          'Trust the AI because it showed its working.',
+          'Assume the textbook is always right and stop thinking about it.',
+          'Work through the steps yourself to find where the two answers split, then decide.',
+        ],
+        answer: 2,
+        why: 'Showing steps does not guarantee correctness. Checking the reasoning yourself finds the real mistake (in the AI, the book, or your own work) and builds your understanding.',
+      },
+      {
+        scenario: '📱 A viral post says: "AI analysis PROVES this supplement boosts exam scores by 40%." It has thousands of shares.',
+        question: 'What is the most reasonable response?',
+        options: [
+          'Share it. If AI says it, it is probably scientific.',
+          'Ask where the data came from and look for the original study or a reliable health source.',
+          'Ignore everything AI-related online.',
+        ],
+        answer: 1,
+        why: 'Adding the word "AI" can make a claim sound objective, but it does not make it true. Misinformation spreads when we trust popularity and technology labels instead of sources.',
+      },
+      {
+        scenario: '🎓 You ask an AI which elective to choose. It gives a persuasive recommendation with clear reasons.',
+        question: 'How should you use this advice?',
+        options: [
+          'Follow it exactly. It has read more than any person.',
+          'Treat it as one input: compare it with your interests, the syllabus and advice from teachers or seniors.',
+          'Ignore it because AI cannot know you.',
+        ],
+        answer: 1,
+        why: 'AI can organise options and raise points you missed, but it does not know your goals or your college context. Good decisions combine AI input with your own judgement and real people.',
+      },
+      {
+        scenario: '🗣️ Two AI answers to the same question: one says "Definitely, 100% certain." The other says "I am not fully sure; here is what I found."',
+        question: 'Which answer is more likely to be correct?',
+        options: [
+          'The confident one.',
+          'The cautious one.',
+          'Neither can be judged by tone. Check the evidence behind both.',
+        ],
+        answer: 2,
+        why: 'Humans tend to mistake confidence for accuracy, and AI text sounds fluent either way. Tone is not evidence, so look at sources and reasoning.',
+      },
+      {
+        scenario: '📅 You ask an AI for the latest scholarship rules and deadline. The answer looks clear and official.',
+        question: 'What is the best way to confirm it?',
+        options: [
+          'Ask the AI the same question again. If the answer matches, it is right.',
+          'Use it. Scholarship rules rarely change.',
+          'Check the official scholarship website or office, because the AI may be outdated.',
+        ],
+        answer: 2,
+        why: 'Asking again is not verification: AI can repeat the same mistake. For rules, dates and money, the official source is the final authority.',
+      },
+    ],
+    tiers: [
+      { min: 5, title: '🧠 Critical thinker', text: 'You question AI without dismissing it. That balance is the whole skill.' },
+      { min: 3, title: '🔎 Smart sceptic in training', text: 'Good instincts. Review the explanations and keep practising the check-before-trust habit.' },
+      { min: 0, title: '⚡ Trust-prone (like most of us!)', text: 'Fluent answers are persuasive. Now you know the traps, so you can spot them next time.' },
+    ],
+    takeaway: `<p>AI outputs should be <strong>evaluated</strong>, not automatically trusted <em>or</em> automatically rejected. Use AI as a thinking partner: ask it for ideas, drafts and explanations, then check the facts, compare sources, and make the final decision yourself.</p>`,
+  });
+
+  /* ---------- Bonus game content ---------- */
+  const bias = createQuiz({
+    rootId: '#bias-app',
+    key: 'bias',
+    startLabel: 'Start Spot the Bias',
+    intro: 'Five everyday moments where first impressions or past experience steer our thinking. Pick the most reasonable response.',
+    questions: [
+      {
+        scenario: '🧑‍💼 In a group project, Meera is tall, well dressed and speaks confidently. Everyone assumes she is also the smartest and picks her as leader without hearing other ideas.',
+        question: 'What is the most reasonable response?',
+        options: [
+          'Pick her. Confident people are usually the most capable.',
+          'Listen to everyone\'s ideas and judge each on its merits, not on how it is presented.',
+          'Pick the quietest person to balance things out.',
+        ],
+        answer: 1,
+        why: 'This is the <strong>halo effect</strong>: one good trait (confidence, looks) makes us assume other good traits. Judge the work, not the packaging.',
+      },
+      {
+        scenario: '🌙 Rahul believes night owls are smarter. He searches online and only reads the articles that agree with him.',
+        question: 'What would a good thinker do?',
+        options: [
+          'Keep going. Finding many agreeing articles proves it.',
+          'Deliberately look for evidence that could prove him wrong, too.',
+          'Stop reading and go with his gut.',
+        ],
+        answer: 1,
+        why: 'This is <strong>confirmation bias</strong>: we notice and remember information that fits what we already believe. Testing your idea against opposing evidence is how you find the truth.',
+      },
+      {
+        scenario: '📝 Before an exam, Sana says "I am 100% sure I will score above 90, no need to revise." Last test she predicted 90 and got 65.',
+        question: 'What is the best response?',
+        options: [
+          'Trust the feeling. Confidence makes success more likely.',
+          'Compare past predictions with real results and make a revision plan.',
+          'Assume she will fail and give up.',
+        ],
+        answer: 1,
+        why: 'This is <strong>overconfidence</strong>: feeling certain does not mean being right. Looking at your track record is a more reliable guide than gut feeling.',
+      },
+      {
+        scenario: '🛍️ A jacket tag says "Was ₹5,000, now ₹2,500!" You feel like it is a bargain, though you have never checked what such jackets normally cost.',
+        question: 'What should you do?',
+        options: [
+          'Buy it. Half price is a great deal.',
+          'Compare similar jackets in other shops or sites before deciding.',
+          'Avoid all sales forever.',
+        ],
+        answer: 1,
+        why: 'This is <strong>anchoring</strong>: the first number we see becomes our reference point, even if it is arbitrary. Find your own reference price before judging a deal. (AI answers can anchor us too: the first answer we read shapes how we judge the rest.)',
+      },
+      {
+        scenario: '🍽️ Ananya had one bad meal at a restaurant two years ago and has refused to go back. Friends say it has new owners and a new menu.',
+        question: 'What is the most reasonable response?',
+        options: [
+          'Never go. A first impression is always right.',
+          'Update her opinion with the new information and give it another try.',
+          'Go only if the restaurant is cheap.',
+        ],
+        answer: 1,
+        why: 'Early experiences stick hard, and we often ignore new evidence. This is a <strong>first-impression bias</strong>. A reasonable thinker updates their view when the facts change.',
+      },
+    ],
+    tiers: [
+      { min: 4, title: '🔍 Bias detective', text: 'You spotted the shortcuts. Noticing them is the first step to beating them.' },
+      { min: 2, title: '🧩 Getting there', text: 'These traps are sneaky. Re-read the explanations and watch for them this week.' },
+      { min: 0, title: '🌱 Fresh eyes', text: 'Everyone has these biases, and now you can name them.' },
+    ],
+    takeaway: `<p>Our brains use shortcuts, and they are usually helpful but sometimes misleading. Name the shortcut (<strong>halo effect</strong>, <strong>confirmation bias</strong>, <strong>overconfidence</strong>, <strong>anchoring</strong>), slow down, and look for evidence on both sides. AI is trained on human-written data, so it can inherit our biases too, which is another reason to double-check.</p>`,
+  });
+
+  /* ---------- Page wiring ---------- */
+  $('#startBtn').addEventListener('click', () => {
+    const target = $('#stroop');
+    target.scrollIntoView();
+    const btn = target.querySelector('[data-action="start"]');
+    if (btn) btn.focus({ preventScroll: true });
+  });
+
+  $('#resetAll').addEventListener('click', () => {
+    stroop.reset(); memory.reset(); trust.reset(); bias.reset();
+    Object.keys(scores).forEach((k) => setScore(k, null));
+    $('#welcome').scrollIntoView();
+  });
+
+  renderSummary();
+
+  // Expose for testing only (harmless in the browser)
+  window.__mindlab = { memory, scores };
+})();
+</script>
+</body>
+</html>
+
+</body></html>
